@@ -140,9 +140,7 @@ def setLed():
         GPIO.output(green, GPIO.LOW)
         GPIO.output(blue, GPIO.LOW)
         
-    
-                           
-    return "LED: %s" % (led)
+        return "LED: %s" % (led)
 
 
 
