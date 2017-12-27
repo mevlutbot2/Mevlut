@@ -2,7 +2,7 @@ from flask import Flask, render_template, request
 #!usr/bin/python
 import numpy as np
 import cv2
-from time import sleep
+from time import sleep, time
 import RPi.GPIO as GPIO
 import google.assistant.library as google
 
@@ -35,8 +35,37 @@ GPIO.output(Forward2, GPIO.LOW)
 GPIO.output(Backward, GPIO.LOW)
 GPIO.output(Backward2, GPIO.LOW)
 
+#Time stuff
+prev = time()
+
+
 app = Flask(__name__)
 
+
+
+
+def turnLeft():
+    now = time()
+    if now - prev > 0.5:
+        GPIO.output(Forward, GPIO.HIGH)
+        GPIO.output(Forward2, GPIO.LOW)
+        GPIO.output(Backward, GPIO.LOW)
+        GPIO.output(Backward2, GPIO.HIGH)
+        prev = now
+
+        
+def turnRight():
+    now = time()
+    if now - prev > 0.5:
+        GPIO.output(Forward, GPIO.LOW)
+        GPIO.output(Forward2, GPIO.HIGH)
+        GPIO.output(Backward, GPIO.HIGH)
+        GPIO.output(Backward2, GPIO.LOW)
+        prev = now
+                
+        
+        
+        
 @app.route('/setMotor', methods=['GET', 'POST'])
 #Usage: /setMotor?motor=forward
 def setMotor():
@@ -63,6 +92,59 @@ def setMotor():
     GPIO.output(pin2, GPIO.LOW)
                            
     return "Motor: %s" % (motor)
+
+
+
+
+@app.route('/setLed', methods=['GET', 'POST'])
+#Usage: /setLed?led=red
+def setLed():
+    red = 
+    green =
+    blue = 
+    
+    led = request.values['led']
+    
+    if led.lower().__contains__("red"):
+        GPIO.output(red, GPIO.HIGH)
+        GPIO.output(green, GPIO.LOW)
+        GPIO.output(blue, GPIO.LOW)
+
+    elif led.lower().__contains__("green"):
+        GPIO.output(red, GPIO.LOW)
+        GPIO.output(green, GPIO.HIGH)
+        GPIO.output(blue, GPIO.LOW)
+
+    elif led.lower().__contains__("blue"):
+        GPIO.output(red, GPIO.LOW)
+        GPIO.output(green, GPIO.LOW)
+        GPIO.output(blue, GPIO.HIGH)
+        
+    elif led.lower().__contains__("yellow"):
+        GPIO.output(red, GPIO.HIGH)
+        GPIO.output(green, GPIO.HIGH)
+        GPIO.output(blue, GPIO.LOW)
+        
+    elif led.lower().__contains__("purple") or led.lower().__contains__("pink"):
+        GPIO.output(red, GPIO.HIGH)
+        GPIO.output(green, GPIO.LOW)
+        GPIO.output(blue, GPIO.HIGH)
+        
+    elif led.lower().__contains__("white"):
+        GPIO.output(red, GPIO.HIGH)
+        GPIO.output(green, GPIO.HIGH)
+        GPIO.output(blue, GPIO.HIGH)
+    
+    elif led.lower().__contains__("off"):
+        GPIO.output(red, GPIO.LOW)
+        GPIO.output(green, GPIO.LOW)
+        GPIO.output(blue, GPIO.LOW)
+        
+    
+                           
+    return "LED: %s" % (led)
+
+
 
 
 @app.route('/followLine', methods=['GET', 'POST'])
@@ -112,8 +194,7 @@ def followline():
      
             cv2.drawContours(crop_img, contours, -1, (0,255,0), 1)
      
-            print "cx:" + str(cx)
-            print ""
+            print cx
      
             if cx >= 120:
                 turnRight()
@@ -137,16 +218,3 @@ def followline():
     
 if __name__ == "__main__":
     app.run('10.0.89.215', 9999)
-
-def turnLeft():
-    GPIO.output(Forward, GPIO.HIGH)
-    GPIO.output(Forward2, GPIO.LOW)
-    GPIO.output(Backward, GPIO.LOW)
-    GPIO.output(Backward2, GPIO.HIGH)
-
-def turnRight():
-    GPIO.output(Forward, GPIO.LOW)
-    GPIO.output(Forward2, GPIO.HIGH)
-    GPIO.output(Backward, GPIO.HIGH)
-    GPIO.output(Backward2, GPIO.LOW)
-                
