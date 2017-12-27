@@ -22,12 +22,15 @@ GPIO.setup(Forward2, GPIO.OUT)
 GPIO.setup(Backward2, GPIO.OUT)
 
 #PWM
+forward_speed = 30
+turn_speed = 15
+
 GPIO.setup(16,GPIO.OUT)
 GPIO.setup(20,GPIO.OUT)
 pwm = GPIO.PWM(16, 100)
-pwm.start(40)
+pwm.start(forward_speed)
 pwm2 = GPIO.PWM(20, 100)
-pwm2.start(40)
+pwm2.start(forward_speed)
 
 #Stopping motors on start
 GPIO.output(Forward, GPIO.LOW)
@@ -47,6 +50,8 @@ app = Flask(__name__)
 def turnLeft():
     now = time()
     if now - prev > 0.5:
+        pwm.ChangeDutyCycle(turn_speed)
+        pwm2.ChangeDutyCycle(turn_speed)
         GPIO.output(Forward, GPIO.HIGH)
         GPIO.output(Forward2, GPIO.LOW)
         GPIO.output(Backward, GPIO.LOW)
@@ -57,6 +62,8 @@ def turnLeft():
 def turnRight():
     now = time()
     if now - prev > 0.5:
+        pwm.ChangeDutyCycle(turn_speed)
+        pwm2.ChangeDutyCycle(turn_speed)
         GPIO.output(Forward, GPIO.LOW)
         GPIO.output(Forward2, GPIO.HIGH)
         GPIO.output(Backward, GPIO.HIGH)
@@ -198,6 +205,8 @@ def followline():
                 turnRight()
      
             if cx < 120 and cx > 50:
+                pwm.ChangeDutyCycle(forward_speed)
+                pwm2.ChangeDutyCycle(forward_speed)
                 GPIO.output(Forward, GPIO.HIGH)
                 GPIO.output(Forward2, GPIO.HIGH)
      
